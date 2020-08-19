@@ -1,12 +1,35 @@
 import React from 'react'
+/**
+ * 配置路由：根组件配置路由
+ * 1. 安装：npm i react-router-dom
+ * 2. 导入路由配置的三个基础组件：BrowserRouter,Route,Link
+ * 3. 使用BrowserRouter包裹根组件的模版
+ * 4. 使用Route组件配置路由规则
+ * 5. 使用Link组件导航路由
+ */
+import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
+// 导入组件配置路由
+import Home from './pages/Home'
+import CityList from './pages/CityList'
+import Map from './pages/Map'
+import NotFound from './pages/NotFound'
 
-
-
-function App () {
+function App() {
   return (
-    <div className="App">
-      app
-    </div>
+    <BrowserRouter>
+      <Link to="/home">首页</Link>
+      <Link to="/cityList">城市选择</Link>
+      <Link to="/map">地图找房</Link>
+      {/* 配置路由规则 */}
+      {/* 一级路由 */}
+      <Switch>
+        <Route path="/home" component={Home} />
+        <Route path="/cityList" component={CityList} />
+        <Route path="/map" component={Map} />
+        {/* 404页面 */}
+        <Route component={NotFound} />
+      </Switch>
+    </BrowserRouter>
   )
 }
 
