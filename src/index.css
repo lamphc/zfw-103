@@ -20,6 +20,10 @@ li {
   list-style: none;
 }
 
+.test {
+  color: red;
+}
+
 * {
   /* touch-action: pan-y; */
   box-sizing: border-box;
