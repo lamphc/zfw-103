@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom'
 import './index.css'
 // 引入ant组件库样式=>按需加载后不需要引入组件库的样式
 // import 'antd-mobile/dist/antd-mobile.css'
+// 引入字体图标样式
+import './assets/fonts/iconfont.css'
 // 根组件
 import App from './App'
 // PWA的配置

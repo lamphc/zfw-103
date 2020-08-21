@@ -1,0 +1,9 @@
+.tabBarBox {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
+
+.tabBarBox .iconfont {
+  font-size: 24px;
+}

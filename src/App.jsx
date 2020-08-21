@@ -15,6 +15,7 @@ import Map from './pages/Map'
 import NotFound from './pages/NotFound'
 
 function App() {
+  // 模版 =》借助路由在根组件切换页面（组件）
   return (
     <BrowserRouter>
       {/* 配置路由规则 */}
