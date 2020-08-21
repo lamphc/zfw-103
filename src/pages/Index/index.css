@@ -1,0 +1,15 @@
+/* 菜单样式 */
+.nav {
+  padding-top: 13px;
+  text-align: center;
+  background-color: #fff;
+}
+
+.nav img {
+  height: 48px;
+}
+
+.nav p {
+  margin: 8px 0 10px;
+  font-size: 13px;
+}
