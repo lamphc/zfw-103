@@ -46,4 +46,6 @@ MyAxios.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 
+export { BASE_URL }
+
 export default MyAxios
