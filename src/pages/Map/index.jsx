@@ -11,7 +11,7 @@ class Map extends Component {
   initMap() {
     // 验证百度地图API是否成功引入=》成功会输出百度地图提供的方法对象
     console.log(window.BMap)
-    // 结构百度地图API
+    // 解构百度地图API
     const { BMap } = window
     // 1. 创建地图实例
     const map = new BMap.Map('container')
