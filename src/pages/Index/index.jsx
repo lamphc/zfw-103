@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 // 导入轮播图组件
-import { Carousel, Flex, Grid } from 'antd-mobile'
+import { Carousel, Flex, Grid, WingBlank, SearchBar } from 'antd-mobile'
 
 // 导入栏目导航配置
 import Navs from '../../utils/navs'
 
 // 导入axios
-import { getSwiper, getGrid } from '../../utils/api/home'
+import { getSwiper, getGrid, getNews } from '../../utils/api/home'
 // 导入组件样式
 import './index.scss'
 import { BASE_URL } from '../../utils/request'
@@ -23,6 +23,10 @@ export default class Index extends Component {
     ],
     // 租房小组数据
     groups: [],
+    // 咨询列表
+    news: [],
+    // 搜索框关键词
+    keyword: '',
     // 轮播图默认高度
     imgHeight: 212,
     // 控制是否自动播放
@@ -30,30 +34,28 @@ export default class Index extends Component {
   }
 
   componentDidMount() {
-    this.getSwiper()
-    this.getGroups()
+    this.getAllDatas()
   }
 
-  // 获取轮播图数据
-  async getSwiper() {
-    const { status, data } = await getSwiper()
-    if (status === 200) {
-      // 响应式
-      //
-      this.setState({ swiper: data }, () => {
-        // 确保轮播图有数据，触发自动播放=>$nextTick(cb)
-        this.setState({ isPlay: true })
-      })
-    }
-  }
-
-  // 获取租房小组
-  getGroups = async () => {
-    const { status, data } = await getGrid()
-    // console.log(status, data)
-    if (status === 200) {
-      this.setState({ groups: data })
-    }
+  // 封装首页所有接口调用=》三和一
+  getAllDatas() {
+    // 使用Promise.all(array)实现=>并发执行多个promise的后台接口调用
+    const promises = [getSwiper(), getGrid(), getNews()]
+    Promise.all(promises).then((res) => {
+      console.log('获取所有Promise对象执行完的结果：', res)
+      const [swiper, groups, news] = res
+      // 批量响应式
+      this.setState(
+        {
+          swiper: swiper.data,
+          groups: groups.data,
+          news: news.data,
+        },
+        () => {
+          this.setState({ isPlay: true })
+        }
+      )
+    })
   }
 
   // 渲染轮播图
@@ -106,10 +108,85 @@ export default class Index extends Component {
     )
   }
 
+  // 渲染租房小组宫格
+  renderGrid = () => {
+    return (
+      <Grid
+        data={this.state.groups}
+        columnNum={2}
+        hasLine={false}
+        square={false}
+        renderItem={(item) => (
+          // item结构
+          <Flex className="grid-item" justify="between">
+            <div className="desc">
+              <h3>{item.title}</h3>
+              <p>{item.desc}</p>
+            </div>
+            <img src={`${BASE_URL}${item.imgSrc}`} alt="" />
+          </Flex>
+        )}
+      />
+    )
+  }
+
+  // 渲染最新资讯
+  renderNews() {
+    return this.state.news.map((item) => (
+      <div className="news-item" key={item.id}>
+        <div className="imgwrap">
+          <img className="img" src={`${BASE_URL}${item.imgSrc}`} alt="" />
+        </div>
+        <Flex className="content" direction="column" justify="between">
+          <h3 className="title">{item.title}</h3>
+          <Flex className="info" justify="between">
+            <span>{item.from}</span>
+            <span>{item.date}</span>
+          </Flex>
+        </Flex>
+      </div>
+    ))
+  }
+
+  // 渲染顶部导航
+  renderTopNav = () => {
+    return (
+      <Flex justify="around" className="topNav">
+        <div className="searchBox">
+          {/* 城市定位 */}
+          <div
+            className="city"
+            onClick={() => {
+              this.props.history.push('/cityList')
+            }}>
+            北京
+            <i className="iconfont icon-arrow" />
+          </div>
+          {/* 基于input封装 */}
+          <SearchBar
+            value={this.state.keyword}
+            onChange={(v) => this.setState({ keyword: v })}
+            placeholder="请输入小区或地址"
+          />
+        </div>
+        {/* 地图找房 */}
+        <div
+          className="map"
+          onClick={() => {
+            this.props.history.push('/map')
+          }}>
+          <i key="0" className="iconfont icon-map" />
+        </div>
+      </Flex>
+    )
+  }
+
   // 模版
   render() {
     return (
       <div className="Index">
+        {/* 顶部导航 */}
+        {this.renderTopNav()}
         {/* 轮播图 */}
         {this.renderSwiper()}
         {/* 栏目导航 */}
@@ -122,22 +199,12 @@ export default class Index extends Component {
             <span>更多</span>
           </Flex>
           {/* 内容content */}
-          <Grid
-            data={this.state.groups}
-            columnNum={2}
-            hasLine={false}
-            square={false}
-            renderItem={(item) => (
-              // item结构
-              <Flex className="grid-item" justify="between">
-                <div className="desc">
-                  <h3>{item.title}</h3>
-                  <p>{item.desc}</p>
-                </div>
-                <img src={`${BASE_URL}${item.imgSrc}`} alt="" />
-              </Flex>
-            )}
-          />
+          {this.renderGrid()}
+        </div>
+        {/* 新闻咨询列表 */}
+        <div className="news">
+          <h3 className="group-title">最新资讯</h3>
+          <WingBlank size="md">{this.renderNews()}</WingBlank>
         </div>
       </div>
     )

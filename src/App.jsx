@@ -24,7 +24,9 @@ function App() {
         {/* 默认首页重定向 */}
         <Redirect exact from="/" to="/home" />
         <Route path="/home" component={Home} />
+        {/* 城市选择 */}
         <Route path="/cityList" component={CityList} />
+        {/* 地图找房 */}
         <Route path="/map" component={Map} />
         {/* 404页面 */}
         <Route component={NotFound} />
