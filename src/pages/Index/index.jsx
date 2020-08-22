@@ -10,6 +10,7 @@ import { getSwiper, getGrid, getNews } from '../../utils/api/home'
 // 导入组件样式
 import './index.scss'
 import { BASE_URL } from '../../utils/request'
+import { getCurrCity } from '../../utils'
 
 /**
  * 标签栏第一个页面
@@ -31,10 +32,22 @@ export default class Index extends Component {
     imgHeight: 212,
     // 控制是否自动播放
     isPlay: false,
+    // 定位城市信息
+    cityInfo: { label: '--', value: '' },
   }
 
   componentDidMount() {
     this.getAllDatas()
+    this.getCity()
+  }
+
+  // 获取定位信息
+  async getCity() {
+    const res = await getCurrCity()
+    console.log('获取定位信息：', res)
+    this.setState({
+      cityInfo: res,
+    })
   }
 
   // 封装首页所有接口调用=》三和一
@@ -159,7 +172,7 @@ export default class Index extends Component {
             onClick={() => {
               this.props.history.push('/cityList')
             }}>
-            北京
+            {this.state.cityInfo.label}
             <i className="iconfont icon-arrow" />
           </div>
           {/* 基于input封装 */}

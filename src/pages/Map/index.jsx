@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 // 导入组件样式
 import './index.scss'
+import { NavBar, Icon } from 'antd-mobile'
 
 class Map extends Component {
   componentDidMount() {
@@ -20,7 +21,7 @@ class Map extends Component {
     // 3. 地图初始化，同时设置地图展示级别
     /**
      * 第一参数：地图显示的中心位置
-     * 第二个参数：地图缩放级别=》数值越大：地图显示越详细，范围越小 =》数值越大：地图显示范围大，但是不详细
+     * 第二个参数：地图缩放级别=》数值越大：地图显示越详细，范围越小 =》数值越小：地图显示范围大，但是不详细
      */
     map.centerAndZoom(point, 15)
   }
@@ -28,6 +29,12 @@ class Map extends Component {
   render() {
     return (
       <div className="mapBox">
+        <NavBar
+          mode="dark"
+          icon={<Icon type="left" />}
+          onLeftClick={() => this.props.history.goBack()}>
+          地图找房
+        </NavBar>
         {/* 地图容器=》渲染百度地图 */}
         <div id="container"></div>
       </div>
