@@ -3,7 +3,7 @@ import { getCityData, getHotCity } from '../../utils/api/city'
 import { getCurrCity } from '../../utils'
 import { List, AutoSizer } from 'react-virtualized'
 import './index.scss'
-import { NavBar, Icon } from 'antd-mobile'
+import { NavBar, Icon, Toast } from 'antd-mobile'
 
 // List data as an array of strings
 // 假数据
@@ -15,6 +15,8 @@ class CityList extends Component {
     cityList: {},
     // 列表的归类项=》拼音首字母
     cityIndex: [],
+    // 当前滚动到哪一行
+    activeIndex: 0,
   }
 
   componentDidMount() {
@@ -74,14 +76,38 @@ class CityList extends Component {
   }
 
   // 格式化列表渲染的类别
-  formatCateKey(cateKey) {
+  /**
+   *
+   * @param {*} cateKey 类别
+   * @param {*} isIndex 是否是索引导航渲染
+   */
+  formatCateKey(cateKey, isIndex) {
     switch (cateKey) {
       case '#':
-        return '当前城市'
+        return isIndex ? '当' : '当前城市'
       case 'hot':
-        return '热门城市'
+        return isIndex ? '热' : '热门城市'
       default:
         return cateKey.toUpperCase()
+    }
+  }
+
+  // 城市选择和切换
+  /**
+   *
+   * @param {*} item 当前选择的城市
+   */
+  handlerSelect = (item) => {
+    // console.log(item)
+    // 只有北上广深有数据=》可以做城市切换
+    let hasData = ['北京', '上海', '广州', '深圳']
+    if (hasData.includes(item.label)) {
+      // 切换城市
+      // 覆盖定位信息=》变成用户选择的城市
+      sessionStorage.setItem('CURR_CITY', JSON.stringify(item))
+      this.props.history.goBack()
+    } else {
+      Toast.info('当前城市暂无房源数据！')
     }
   }
 
@@ -107,7 +133,12 @@ class CityList extends Component {
         <div className="title">{this.formatCateKey(cateKey)}</div>
         {/* 类别下数据=》城市 => 列表渲染 */}
         {cateList.map((item) => (
-          <div key={item.value} className="name">
+          <div
+            onClick={() => {
+              this.handlerSelect(item)
+            }}
+            key={item.value}
+            className="name">
             {item.label}
           </div>
         ))}
@@ -131,6 +162,49 @@ class CityList extends Component {
     return 36 + 50 * cateList.length
   }
 
+  // 渲染右侧索引
+  renderCityIndex = () => {
+    const { cityIndex, activeIndex } = this.state
+    return cityIndex.map((item, index) => {
+      return (
+        <li
+          onClick={() => {
+            // console.log(this.listRef)
+            this.listRef.scrollToRow(index)
+            // 高亮
+            // this.setState({ activeIndex: index })
+          }}
+          key={item}
+          className="city-index-item">
+          <span className={activeIndex === index ? 'index-active' : ''}>
+            {this.formatCateKey(item, true)}
+          </span>
+        </li>
+      )
+    })
+  }
+  // List每次滚动渲染执行这个钩子函数
+  /**
+   *
+   * @param {*} param0
+   */
+  onRowsRendered = ({
+    // 某一屏数据开始和结束的索引（带下一屏幕多余的数据）
+    overscanStartIndex,
+    overscanStopIndex,
+    // 某一屏数据开始和结束的索引（可见区域）
+    startIndex,
+    stopIndex,
+  }) => {
+    // console.log(overscanStartIndex, overscanStopIndex, startIndex, stopIndex)
+
+    // 滚动到哪一行就高亮显示
+    if (this.state.activeIndex !== startIndex) {
+      console.log('当前滚动到哪一行：', startIndex)
+      this.setState({ activeIndex: startIndex })
+    }
+  }
+
   // 模版
   render() {
     return (
@@ -146,6 +220,12 @@ class CityList extends Component {
         <AutoSizer>
           {({ height, width }) => (
             <List
+              // 获取组件实例=》ref对象
+              ref={(ele) => (this.listRef = ele)}
+              // 滚动对齐方式 =>顶部对齐
+              scrollToAlignment="start"
+              // 每次滚动渲染执行
+              onRowsRendered={this.onRowsRendered}
               // 控制列表宽高
               width={width}
               height={height}
@@ -158,6 +238,8 @@ class CityList extends Component {
             />
           )}
         </AutoSizer>
+        {/* 右侧索引列表 */}
+        <ul className="city-index">{this.renderCityIndex()}</ul>
       </div>
     )
   }
