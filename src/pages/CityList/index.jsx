@@ -1,6 +1,13 @@
 import React, { Component } from 'react'
 import { getCityData, getHotCity } from '../../utils/api/city'
 import { getCurrCity } from '../../utils'
+import { List, AutoSizer } from 'react-virtualized'
+import './index.scss'
+import { NavBar, Icon } from 'antd-mobile'
+
+// List data as an array of strings
+// 假数据
+const list = Array.from(new Array(30)).map(() => Math.random() * 100)
 
 class CityList extends Component {
   componentDidMount() {
@@ -58,8 +65,50 @@ class CityList extends Component {
     }
   }
 
+  // 列表渲染的项item模版
+  rowRenderer({
+    key, // Unique key within array of rows
+    index, // Index of row within collection
+    isScrolling, // The List is currently being scrolled
+    isVisible, // This row is visible within the List (eg it is not an overscanned row)
+    style, // Style object to be applied to row (to position it)
+  }) {
+    return (
+      <div key={key} style={style}>
+        列表项item{index}:{list[index]}
+      </div>
+    )
+  }
+
+  // 模版
   render() {
-    return <div>CityList</div>
+    return (
+      <div className="cityList">
+        {/* 头部导航栏 */}
+        <NavBar
+          mode="dark"
+          icon={<Icon type="left" />}
+          onLeftClick={() => this.props.history.goBack()}>
+          城市选择
+        </NavBar>
+        {/* 城市选择列表 */}
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              // 控制列表宽高
+              width={width}
+              height={height}
+              // 列表数据的总长度
+              rowCount={list.length}
+              // 列表项的高度
+              rowHeight={50}
+              // 选染列表项目
+              rowRenderer={this.rowRenderer}
+            />
+          )}
+        </AutoSizer>
+      </div>
+    )
   }
 }
 

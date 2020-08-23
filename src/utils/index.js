@@ -36,3 +36,30 @@ export function getCurrCity () {
 
   }
 }
+
+
+
+// 封装本地持久化方法
+// 存储
+export function setLocalData (key, val) {
+  localStorage.setItem(key, val)
+}
+// 获取
+export function getLocalData (key) {
+  return localStorage.getItem(key)
+}
+
+// 删除
+export function delLocalData (key) {
+  localStorage.removeItem(key)
+}
+
+
+
+/**
+ * 本地数据持久化（数据存储）
+ * 1. sessionStorage=> 大小：5M => 关闭浏览器/标签就删除了
+ * 2. localStorage=> 大小：5M => 除非用户手动删除
+ * 3. cookie => 大小：4KB =》不安全 =》可以设置有效期 | 没有设置，相当于sessionStorage
+ * 3. IndexedDB => 大小没有限制
+ */
