@@ -7,9 +7,16 @@ import { NavBar, Icon } from 'antd-mobile'
 
 // List data as an array of strings
 // 假数据
-const list = Array.from(new Array(30)).map(() => Math.random() * 100)
+// const list = Array.from(new Array(30)).map(() => Math.random() * 100)
 
 class CityList extends Component {
+  state = {
+    // 列表归类的数据
+    cityList: {},
+    // 列表的归类项=》拼音首字母
+    cityIndex: [],
+  }
+
   componentDidMount() {
     this.getCityList()
   }
@@ -33,7 +40,8 @@ class CityList extends Component {
       const curCity = await getCurrCity()
       cityList['#'] = [curCity]
       cityIndex.unshift('#')
-
+      // 响应式
+      this.setState({ cityList, cityIndex })
       console.log('归类的数据：', cityList, cityIndex)
     }
   }
@@ -65,19 +73,62 @@ class CityList extends Component {
     }
   }
 
+  // 格式化列表渲染的类别
+  formatCateKey(cateKey) {
+    switch (cateKey) {
+      case '#':
+        return '当前城市'
+      case 'hot':
+        return '热门城市'
+      default:
+        return cateKey.toUpperCase()
+    }
+  }
+
   // 列表渲染的项item模版
-  rowRenderer({
+  rowRenderer = ({
     key, // Unique key within array of rows
     index, // Index of row within collection
     isScrolling, // The List is currently being scrolled
     isVisible, // This row is visible within the List (eg it is not an overscanned row)
     style, // Style object to be applied to row (to position it)
-  }) {
+  }) => {
+    // const data = list[index]
+    // 获取归类项和该项数据
+    const { cityList, cityIndex } = this.state
+    // 类别
+    const cateKey = cityIndex[index]
+    // 当前类别下的数据=》城市=》多个或一个
+    const cateList = cityList[cateKey]
+
     return (
-      <div key={key} style={style}>
-        列表项item{index}:{list[index]}
+      <div key={key} style={style} className="city-item">
+        {/* 类别 */}
+        <div className="title">{this.formatCateKey(cateKey)}</div>
+        {/* 类别下数据=》城市 => 列表渲染 */}
+        {cateList.map((item) => (
+          <div key={item.value} className="name">
+            {item.label}
+          </div>
+        ))}
       </div>
     )
+  }
+
+  // 动态计算列表行的高度
+  /**
+   *
+   * @param {*} index 列表项的索引
+   */
+  excueHeight = ({ index }) => {
+    // 获取归类项和该项数据
+    const { cityList, cityIndex } = this.state
+    // 类别
+    const cateKey = cityIndex[index]
+    // 当前类别下的数据=》城市=》多个或一个
+    const cateList = cityList[cateKey]
+
+    return 36 + 50 * cateList.length
   }
 
   // 模版
@@ -99,9 +150,9 @@ class CityList extends Component {
               width={width}
               height={height}
               // 列表数据的总长度
-              rowCount={list.length}
-              // 列表项的高度
-              rowHeight={50}
+              rowCount={this.state.cityIndex.length}
+              // 列表项的高度 => 动态设置高度
+              rowHeight={this.excueHeight}
               // 选染列表项目
               rowRenderer={this.rowRenderer}
             />
