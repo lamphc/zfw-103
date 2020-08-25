@@ -24,6 +24,10 @@ li {
   color: red;
 }
 
+.bg2 {
+  background: blue !important;
+}
+
 * {
   touch-action: pan-y;
   box-sizing: border-box;
