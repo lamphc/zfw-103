@@ -72,7 +72,8 @@ export default class Filter extends Component {
   }
 
   // 点击确定的时候执行
-  onOk = () => {
+  onOk = (sel) => {
+    console.log('当前筛选器选中的值：', sel)
     this.setState({
       openType: ''
     })

@@ -9,10 +9,10 @@ function FilterFooter ({ className, style, onOk, onCancle }) {
   return (
     <Flex style={style} className={[styles.root, className || ''].join(' ')}>
       {/* 取消按钮 */}
-      <span onClick={onOk} className={[styles.btn, styles.cancel].join(' ')}>取消</span>
+      <span onClick={onCancle} className={[styles.btn, styles.cancel].join(' ')}>取消</span>
 
       {/* 确定按钮 */}
-      <span onClick={onCancle} className={[styles.btn, styles.ok].join(' ')}>确定</span>
+      <span onClick={onOk} className={[styles.btn, styles.ok].join(' ')}>确定</span>
     </Flex>
   )
 }
