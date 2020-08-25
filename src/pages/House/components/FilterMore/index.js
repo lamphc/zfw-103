@@ -1,3 +1,6 @@
+/**
+ * 更多筛选器
+ */
 import React, { Component } from 'react'
 
 import FilterFooter from '../../../../components/FilterFooter'
@@ -6,14 +9,14 @@ import styles from './index.module.css'
 
 export default class FilterMore extends Component {
   // 渲染标签
-  renderFilters() {
+  renderFilters () {
     // 高亮类名： styles.tagActive
     return (
       <span className={[styles.tag, styles.tagActive].join(' ')}>东北</span>
     )
   }
 
-  render() {
+  render () {
     return (
       <div className={styles.root}>
         {/* 遮罩层 */}

@@ -1,3 +1,6 @@
+/**
+ * 前三个筛选器公共的picker组件
+ */
 import React, { Component } from 'react'
 
 import { PickerView } from 'antd-mobile'
@@ -88,7 +91,7 @@ const province = [
 ]
 
 export default class FilterPicker extends Component {
-  render() {
+  render () {
     return (
       <>
         {/* 选择器组件： */}
