@@ -33,6 +33,7 @@ li {
   box-sizing: border-box;
 }
 
-#root {
+#root,
+.home {
   height: 100%;
 }

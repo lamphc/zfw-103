@@ -12,3 +12,21 @@ export function getFilters (id) {
     params: { id }
   })
 }
+
+/**
+ * 
+ * @param {*} cityId 当前定位城市ID
+ * @param {*} filters 查询条件
+ * @param {*} start 数据开始
+ * @param {*} end  数据结束
+ */
+export function getListByFilter (cityId, filters, start = 1, end = 20) {
+  return request.get('/houses', {
+    params: {
+      cityId,
+      ...filters,
+      start,
+      end
+    }
+  })
+}

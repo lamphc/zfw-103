@@ -120,6 +120,35 @@ export default class Filter extends Component {
 
   }
 
+  // 处理查询条件数据
+  handlerFilters () {
+    // 获取用户选择的查询条件
+    const { area, mode, price, more } = this.filterSels
+    // 组装查询条件
+    const filters = {}
+    // 1. 区域条件: 区域和地铁
+    let areaKey = area[0], areaVal
+    if (area.length === 2) {
+      areaVal = area[1]
+    } else {
+      if (area[2] !== 'null') {
+        areaVal = area[2]
+      } else {
+        areaVal = area[1]
+      }
+    }
+    filters[areaKey] = areaVal
+    // 2. 出租方式
+    filters.rentType = mode[0]
+    // 3. 价格
+    filters.price = price[0]
+    // 4. 更多
+    filters.more = more.join(',')
+    console.log('当前选择的查询条件（后台）：', filters)
+    return filters
+
+  }
+
   // 点击确定的时候执行
   onOk = (sel) => {
     const { openType } = this.state
@@ -131,6 +160,10 @@ export default class Filter extends Component {
       openType: '',
       // 处理选中条件后title的状态
       titleSeledStatus: this.handlerSelStatus()
+    }, () => {
+      // 传递查询条件=》父组件=》查询房源列表
+      this.props.onFilterSel(this.handlerFilters())
+
     })
   }
 
