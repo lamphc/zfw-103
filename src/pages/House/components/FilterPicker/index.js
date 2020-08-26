@@ -9,9 +9,14 @@ import FilterFooter from '../../../../components/FilterFooter'
 
 export default class FilterPicker extends Component {
 
+  constructor(props) {
+    super(props)
+    console.log('1. 组件初始化=》只执行一次')
+  }
+
   state = {
     // 当前筛选器选中的值
-    value: null
+    value: this.props.value
   }
 
 
