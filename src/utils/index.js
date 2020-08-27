@@ -41,6 +41,8 @@ export function getCurrCity () {
 
 // 封装本地持久化方法
 // 存储
+const HZW_TOKEN = 'HZW_TOKEN'
+
 export function setLocalData (key, val) {
   localStorage.setItem(key, val)
 }
@@ -53,6 +55,8 @@ export function getLocalData (key) {
 export function delLocalData (key) {
   localStorage.removeItem(key)
 }
+
+export { HZW_TOKEN }
 
 
 
