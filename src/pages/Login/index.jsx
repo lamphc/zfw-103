@@ -8,10 +8,11 @@ import { login } from '../../utils/api/user'
 import { setLocalData, HZW_TOKEN } from '../../utils'
 
 import { withFormik } from 'formik'
+import * as yup from 'yup'
 
 // 验证规则：
-// const REG_UNAME = /^[a-zA-Z_\d]{5,8}$/
-// const REG_PWD = /^[a-zA-Z_\d]{5,12}$/
+const REG_UNAME = /^[a-zA-Z_\d]{5,8}$/
+const REG_PWD = /^[a-zA-Z_\d]{5,12}$/
 
 /**
  * 表单处理
@@ -71,8 +72,10 @@ class Login extends Component {
       handleSubmit,
     } = this.props
     // console.log(this.props)
+    // console.log(errors)
     return (
       <div className={styles.root}>
+        {/* <h1>{errors.username}</h1> */}
         {/* 顶部导航 */}
         <NavBar mode="light">账号登录</NavBar>
         <WhiteSpace size="xl" />
@@ -90,7 +93,9 @@ class Login extends Component {
               />
             </div>
             {/* 长度为5到8位，只能出现数字、字母、下划线 */}
-            {/* <div className={styles.error}>账号为必填项</div> */}
+            {errors.username && (
+              <div className={styles.error}>{errors.username}</div>
+            )}
             <div className={styles.formItem}>
               <input
                 value={values.password}
@@ -102,7 +107,9 @@ class Login extends Component {
               />
             </div>
             {/* 长度为5到12位，只能出现数字、字母、下划线 */}
-            {/* <div className={styles.error}>账号为必填项</div> */}
+            {errors.password && (
+              <div className={styles.error}>{errors.password}</div>
+            )}
             <div className={styles.formSubmit}>
               <button className={styles.submit} type="submit">
                 登 录
@@ -122,19 +129,33 @@ class Login extends Component {
 
 const NewLogin = withFormik({
   // 设置表单响应数据 => 等价于=》类组件中定义state数据
-  // 注意：表单元素的name值要和values保持一致
+  // 注意：表单元素的name值要和values保持一致 ==== username: 'test2', password: 'test2'
   mapPropsToValues: () => ({ username: 'test2', password: 'test2' }),
 
   // Custom sync validation
-  // validate: values => {
-  //   const errors = {};
+  // 验证表单输入框的值：
+  // 1. 手动
+  // validate: (values) => {
+  //   console.log(values)
+  //   const errors = {}
 
-  //   if (!values.name) {
-  //     errors.name = 'Required';
+  //   if (!values.username) {
+  //     errors.username = '不能为空！'
   //   }
 
-  //   return errors;
+  //   return errors
   // },
+  // 2. 配置 => 基于yup的schema对象
+  validationSchema: yup.object().shape({
+    username: yup
+      .string()
+      .required('账号不能为空！')
+      .matches(REG_UNAME, '长度为5到8位，只能出现数字、字母、下划线'),
+    password: yup
+      .string()
+      .required('密码不能为空！')
+      .matches(REG_PWD, '长度为5到12位，只能出现数字、字母、下划线'),
+  }),
   // 表单提交事件
   handleSubmit: async (values, { props }) => {
     // console.log(formikBag)
