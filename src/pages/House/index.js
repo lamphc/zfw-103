@@ -3,7 +3,7 @@
  */
 import React from 'react'
 
-import { Flex } from 'antd-mobile'
+import { Toast } from 'antd-mobile'
 
 import Filter from './components/Filter'
 // 导入局部样式
@@ -13,6 +13,7 @@ import { getListByFilter } from '../../utils/api/house'
 import { List, AutoSizer, InfiniteLoader } from 'react-virtualized'
 import HouseItem from '../../components/HouseItem'
 import { BASE_URL } from '../../utils/request'
+import NoHouse from '../../components/NoHouse'
 
 
 export default class HouseList extends React.Component {
@@ -50,6 +51,9 @@ export default class HouseList extends React.Component {
     const { status, data: { list, count } } = await getListByFilter(this.cityId, this.filters)
     // console.log(status, data)
     if (status === 200) {
+      // 房源查询结果提示
+      count > 0 && Toast.success(`查询到${count}条房源数据！`)
+
       this.setState({
         list,
         count
@@ -74,7 +78,9 @@ export default class HouseList extends React.Component {
       // 处理图片地址
       item.src = `${BASE_URL}${item.houseImg}`
       return (
-        <HouseItem {...item} key={key} style={style} />
+        <HouseItem onClick={() => {
+          this.props.history.push({ pathname: '/detail/' + item.houseCode, data: { a: 123 }, abc: 100 })
+        }} {...item} key={key} style={style} />
 
       )
     } else {
@@ -111,39 +117,48 @@ export default class HouseList extends React.Component {
   }
 
 
+  // 渲染房源列表
+  renderList () {
+    const { count } = this.state
+    return (
+      count === 0 ? <NoHouse>暂无房源数据！</NoHouse> : <InfiniteLoader
+        isRowLoaded={this.isRowLoaded}
+        loadMoreRows={this.loadMoreRows}
+        // 列表数据的总条数
+        rowCount={this.state.count}
+      >
+        {({ onRowsRendered, registerChild }) => (
+          <AutoSizer>
+            {({ height, width }) => (
+              <List
+                className={styles.houseList}
+                onRowsRendered={onRowsRendered}
+                ref={registerChild}
+                // 列表数据的总条数
+                rowCount={this.state.count}
+                // 控制列表宽高
+                width={width}
+                height={height}
+                // 列表项的高度 => 动态设置高度
+                rowHeight={130}
+                // 选染列表项目
+                rowRenderer={this.rowRenderer}
+              />
+            )}
+          </AutoSizer>
+        )}
+      </InfiniteLoader>
+    )
+  }
+
+
   render () {
     return (
       <div className={styles.root}>
         {/* 条件筛选栏--先开发 */}
         <Filter onFilterSel={this.onFilterSel} />
         {/* 根据过滤条件=》渲染房源列表 */}
-        <InfiniteLoader
-          isRowLoaded={this.isRowLoaded}
-          loadMoreRows={this.loadMoreRows}
-          // 列表数据的总条数
-          rowCount={this.state.count}
-        >
-          {({ onRowsRendered, registerChild }) => (
-            <AutoSizer>
-              {({ height, width }) => (
-                <List
-                  className={styles.houseList}
-                  onRowsRendered={onRowsRendered}
-                  ref={registerChild}
-                  // 列表数据的总条数
-                  rowCount={this.state.count}
-                  // 控制列表宽高
-                  width={width}
-                  height={height}
-                  // 列表项的高度 => 动态设置高度
-                  rowHeight={130}
-                  // 选染列表项目
-                  rowRenderer={this.rowRenderer}
-                />
-              )}
-            </AutoSizer>
-          )}
-        </InfiniteLoader>
+        {this.renderList()}
       </div>
     )
   }

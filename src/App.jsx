@@ -13,6 +13,7 @@ import Home from './pages/Home'
 import CityList from './pages/CityList'
 import Map from './pages/Map'
 import NotFound from './pages/NotFound'
+import HouseDetail from './components/HouseDetail'
 
 function App() {
   // 模版 =》借助路由在根组件切换页面（组件）
@@ -28,6 +29,8 @@ function App() {
         <Route path="/cityList" component={CityList} />
         {/* 地图找房 */}
         <Route path="/map" component={Map} />
+        {/* 房源详情 */}
+        <Route path="/detail/:id" component={HouseDetail} />
         {/* 404页面 */}
         <Route component={NotFound} />
       </Switch>

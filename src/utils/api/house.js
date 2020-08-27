@@ -30,3 +30,11 @@ export function getListByFilter (cityId, filters, start = 1, end = 20) {
     }
   })
 }
+
+/**
+ * 房源详情
+ * @param {*} id 房源ID
+ */
+export function getDetail (id) {
+  return request.get(`/houses/${id}`)
+}
