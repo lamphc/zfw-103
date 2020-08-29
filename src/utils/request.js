@@ -4,6 +4,7 @@
 import axios from 'axios'
 // 轻提示组件
 import { Toast } from 'antd-mobile'
+import { getToken } from '.'
 
 // 创建axios实例
 // 请求的基础地址
@@ -19,6 +20,13 @@ MyAxios.interceptors.request.use(function (config) {
   // Do something before request is sent
   // console.log('发送请求之前会执行')
   Toast.loading('请求中...', 0)
+  // 根据请求的url判断=》如果是/user开发（排除登录和注册）=》请求头添加token
+  let rurl = config.url, whiteName = ['/user/registered', '/user/login']
+  if (rurl.startsWith('/user') && !whiteName.includes(rurl)) {
+    config.headers.authorization = getToken()
+  }
+  // console.log(config)
+
   return config
 }, function (error) {
   // Do something with request error

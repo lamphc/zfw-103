@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 
 import styles from './index.module.css'
 import { login } from '../../utils/api/user'
-import { setLocalData, HZW_TOKEN } from '../../utils'
+import { setToken } from '../../utils'
 
 import { withFormik } from 'formik'
 import * as yup from 'yup'
@@ -175,7 +175,7 @@ const NewLogin = withFormik({
         props.history.push('/home/profile')
       })
       // 把token存储到本地
-      setLocalData(HZW_TOKEN, data.token)
+      setToken(data.token)
     } else {
       Toast.fail(description)
     }

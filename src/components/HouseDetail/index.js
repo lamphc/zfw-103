@@ -5,6 +5,8 @@ import styles from './index.module.css'
 import HousePackage from '../HousePackage'
 import { BASE_URL } from '../../utils/request'
 import { getDetail } from '../../utils/api/house'
+import { isAuth } from '../../utils'
+import { checkFav } from '../../utils/api/user'
 
 // 猜你喜欢
 const recommendHouses = [
@@ -105,6 +107,20 @@ export default class HouseDetail extends Component {
 
     // 获取房屋数据
     this.getHouseDetail()
+    // 查询房源是否被当前登录人收藏过
+    this.checkFav()
+  }
+
+  // 如果登录了=》查询当前详情页的房源=》用户是否收藏过
+  async checkFav () {
+    if (!isAuth()) return
+    // 获取当前房源的ID
+    const { id } = this.props.match.params
+    const { status, data } = await checkFav(id)
+    // console.log(status, data)
+    if (status === 200) {
+      this.setState({ isFavorite: data.isFavorite })
+    }
   }
 
   /* 
