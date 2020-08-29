@@ -172,7 +172,13 @@ const NewLogin = withFormik({
       console.log(this)
       Toast.success(description, 1, () => {
         // 跳转路由=》我的 =>获取不到Login组件的this
-        props.history.push('/home/profile')
+        // 如果存在backUrl=》跳转到backUrl的页面
+        if (props.location.backUrl) {
+          props.history.replace(props.location.backUrl)
+        } else {
+          // 默认跳回个人中心
+          props.history.replace('/home/profile')
+        }
       })
       // 把token存储到本地
       setToken(data.token)

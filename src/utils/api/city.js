@@ -31,5 +31,16 @@ export function getHotCity () {
   return request.get('/area/hot')
 }
 
+/**
+ * 查询小区
+ * @param {*} name 关键词
+ * @param {*} id 当前定位城市的ID
+ */
+export function getCommunity (name, id) {
+  return request.get('/area/community', {
+    params: { name, id }
+  })
+}
+
 
 

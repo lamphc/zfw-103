@@ -6,7 +6,7 @@ import HousePackage from '../HousePackage'
 import { BASE_URL } from '../../utils/request'
 import { getDetail } from '../../utils/api/house'
 import { isAuth } from '../../utils'
-import { checkFav } from '../../utils/api/user'
+import { checkFav, delFav, addFav } from '../../utils/api/user'
 
 // 猜你喜欢
 const recommendHouses = [
@@ -144,6 +144,44 @@ export default class HouseDetail extends Component {
         }
       ])
     */
+
+  handleFavorite = async () => {
+    const { replace } = this.props.history
+    if (!isAuth()) {
+      //  没有登录=》不能使用收藏功能
+      // 提示：需要登录才能收藏
+      alert('提示', '登录后才能收藏房源，是否去登录?', [
+        { text: '取消' },
+        {
+          text: '去登录',
+          onPress: () => {
+            // 需求：登录=》登录成功后=》返回上次访问的页面
+            // 1. replace和push都可以跳转路由
+            // 2. repalce替换当前路由堆栈，下一个页面不能使用goBack()方法
+            replace({ pathname: '/login', backUrl: this.props.location.pathname })
+          }
+        }
+      ])
+    } else {
+      // 登录=》收藏
+      const { isFavorite } = this.state
+      // 获取当前房源的ID
+      const { id } = this.props.match.params
+      if (isFavorite) {
+        // 如果收藏过=》变成未收藏
+        const res = await delFav(id)
+        res.status === 200 && this.setState({
+          isFavorite: false
+        })
+      } else {
+        // 如果没有收藏过=》变成收藏
+        const res = await addFav(id)
+        res.status === 200 && this.setState({
+          isFavorite: true
+        })
+      }
+    }
+  }
 
   // 获取房屋详细信息
   async getHouseDetail () {

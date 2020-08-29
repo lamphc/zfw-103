@@ -31,3 +31,26 @@ export function logout () {
 export function checkFav (id) {
   return request.get(`/user/favorites/${id}`)
 }
+
+/**
+ * 添加收藏
+ * @param {*} id 房源ID
+ */
+export function addFav (id) {
+  return request.post(`/user/favorites/${id}`)
+}
+
+/**
+ * 删除收藏
+ * @param {*} id 房源ID
+ */
+export function delFav (id) {
+  return request.delete(`/user/favorites/${id}`)
+}
+
+/**
+ * 获取已发布房源列表数据
+ */
+export function getPubHouse () {
+  return request.get('/user/houses')
+}
