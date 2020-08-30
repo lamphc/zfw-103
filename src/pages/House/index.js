@@ -36,9 +36,6 @@ export default class HouseList extends React.Component {
   }
 
   async componentDidMount () {
-    fetch('http://api-haoke-dev.itheima.net/home/swiper').then((res) => {
-      res.json().then((r) => console.log(r))
-    })
     //  获取当前定位城市的ID
     let { value } = await getCurrCity()
     this.cityId = value
