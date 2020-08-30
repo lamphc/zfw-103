@@ -63,16 +63,14 @@ export default function Hook() {
     }
     fetchData()
     console.log('组件挂载了！')
+    // 当作：componentWillUnmount
+    return () => console.log('组件卸载了！')
   }, [])
 
-  // 当作生命周期钩子函数使用
+  // 当作生命周期钩子函数使用=》'相当于：`componentDidMount`、`componentDidUpdate` 和 `componentWillUnmount` '
+  // 当作：componentDidUpdate
   useEffect(() => {
-    console.log(
-      '相当于：`componentDidMount`、`componentDidUpdate` 和 `componentWillUnmount` '
-    )
-    return () => {
-      console.log('在组件卸载和更新时调用！')
-    }
+    console.log('go')
   }, [name, obj])
 
   // 模版
