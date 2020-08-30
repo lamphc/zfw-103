@@ -17,6 +17,12 @@ const TabBarList = [
     title: '我的',
     icon: 'icon-my',
     pathname: '/home/profile',
+  },
+  {
+    id: 3,
+    title: 'Hook',
+    icon: 'icon-message',
+    pathname: '/home/hook',
   }
 ]
 

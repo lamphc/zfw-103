@@ -11,10 +11,12 @@ import './index.css'
 
 // 导入tabBar配置
 import TabBarList from '../../utils/tabBarConfig'
+import Hook from '../Hook'
 
 class Home extends Component {
   // 响应数据
   state = {
+    count: 0,
     // tabBar当前选中的状态
     selectedTab: this.props.location.pathname,
   }
@@ -57,6 +59,8 @@ class Home extends Component {
         <Route exact path="/home" component={Index} />
         <Route path="/home/house" component={House} />
         <Route path="/home/profile" component={Profile} />
+        {/* 演示react-hook用法 */}
+        <Route path="/home/hook" component={Hook} />
 
         {/* tabBar标签栏 */}
         <div className="tabBarBox">{this.renderTabBar()}</div>
