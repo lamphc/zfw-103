@@ -43,7 +43,7 @@ export default class Profile extends Component {
     const { isLogin } = this.state
     if (isLogin) {
       // 获取登录人信息
-      const { status, data } = await getUserData()
+      const { status, data, description } = await getUserData()
       // console.log(status, data)
       if (status === 200) {
         // 处理头像
@@ -52,6 +52,13 @@ export default class Profile extends Component {
         this.setState({
           userInfo: data,
         })
+      } else {
+        // token过期重新登录
+        if (status === 400) {
+          Toast.fail(description, 2, () => {
+            this.props.history.replace('/login')
+          })
+        }
       }
     }
   }

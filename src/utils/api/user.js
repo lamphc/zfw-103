@@ -54,3 +54,11 @@ export function delFav (id) {
 export function getPubHouse () {
   return request.get('/user/houses')
 }
+
+/**
+ * 发布房源
+ * @param {*} data 房源数据
+ */
+export function pubHouse (data) {
+  return request.post('/user/houses', data)
+}

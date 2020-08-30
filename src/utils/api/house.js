@@ -38,3 +38,11 @@ export function getListByFilter (cityId, filters, start = 1, end = 20) {
 export function getDetail (id) {
   return request.get(`/houses/${id}`)
 }
+
+/**
+ * 上传房源图片
+ * @param {*} formData formData格式的图片数据
+ */
+export function uploadHouseImg (formData) {
+  return request.post('/houses/image', formData)
+}
