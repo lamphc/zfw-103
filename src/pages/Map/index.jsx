@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 // 导入组件样式
-import './index.scss'
+import styles from './index.module.css'
 import { NavBar, Icon } from 'antd-mobile'
 import { getCurrCity } from '../../utils'
+import { getMapDataById } from '../../utils/api/city'
 
 class Map extends Component {
   componentDidMount() {
@@ -18,14 +19,14 @@ class Map extends Component {
     // 1. 创建地图实例
     const map = new BMap.Map('container')
     // 获取定位城市
-    const { label, value } = await getCurrCity()
+    const { label: la, value } = await getCurrCity()
     // 地址解析=》解析经纬度=》Point
     // 创建地址解析器实例
     const myGeo = new BMap.Geocoder()
     // 将地址解析结果显示在地图上，并调整地图视野
     myGeo.getPoint(
       null,
-      (point) => {
+      async (point) => {
         if (point) {
           // 2. 地图初始化,设置地图位置和地图展示级别
           /**
@@ -33,28 +34,39 @@ class Map extends Component {
            * 第二个参数：地图缩放级别=》数值越大：地图显示越详细，范围越小 =》数值越小：地图显示范围大，但是显示信息不详细
            */
           map.centerAndZoom(point, 11)
+
+          // 测试：获取地图第一层覆盖物的数据
+          const { status, data } = await getMapDataById(value)
+          console.log(status, data)
           /**
-           * 创建文本覆盖物
+           * 创建文本覆盖物=>根据后台房源数据遍历创建展示房源数据的覆盖物
            */
           const opts = {
             position: point, // 指定文本标注所在的地理位置
-            offset: new BMap.Size(-120, -60), //设置文本偏移量
+            offset: new BMap.Size(0, 0), //设置文本偏移量
           }
           // 创建文本覆盖物的实例
-          const label = new BMap.Label(
-            '欢迎使用百度地图，这是一个简单的文本标注哦~',
-            opts
-          )
+          const label = new BMap.Label(null, opts)
           // 设置文本覆盖物的样式
           label.setStyle({
-            color: 'blue',
-            fontSize: '12px',
-            height: '20px',
-            lineHeight: '20px',
-            fontFamily: '微软雅黑',
+            // 清除默认样式
+            background: 'transparent',
+            border: 0,
           })
+          // 设置html内容（不是jsx）
+          label.setContent(`
+          <div class="${styles.bubble}">
+          <p class="${styles.bubbleName}">顺义区</p>
+          <p>388套</p>
+        </div>
+          `)
           //  添加到地图中渲染
           map.addOverlay(label)
+
+          // 添加点击事件
+          label.addEventListener('click', () => {
+            console.log(la + ':' + value)
+          })
 
           // 添加地图操作控件
           // 地图平移缩放控件
@@ -68,16 +80,17 @@ class Map extends Component {
           // 添加marker覆盖物
           const marker = new BMap.Marker(point)
           map.addOverlay(marker)
+          // 设置动画
           marker.setAnimation(window.BMAP_ANIMATION_BOUNCE) //跳动的动画
         }
       },
-      label
+      la
     )
   }
 
   render() {
     return (
-      <div className="mapBox">
+      <div className={styles.mapBox}>
         <NavBar
           mode="dark"
           icon={<Icon type="left" />}

@@ -42,5 +42,18 @@ export function getCommunity (name, id) {
   })
 }
 
+/**
+ * 查询地图找房需要的数据=》下钻数据
+ * 1. 城市ID =》 当前城市下区的房源数据
+ * 2. 城市下某个区的ID =》区下的镇/街道的房源数据
+ * 3. 镇/街道的ID => 小区的房源数据
+ * @param {*} id 区域ID
+ */
+export function getMapDataById (id) {
+  return request.get('/area/map', {
+    params: { id }
+  })
+}
+
 
 
