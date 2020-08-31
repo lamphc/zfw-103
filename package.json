@@ -14,7 +14,9 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "react-use": "^15.3.3",
     "react-virtualized": "^9.22.2",
+    "rebound": "^0.1.0",
     "yup": "^0.29.3"
   },
   "scripts": {
