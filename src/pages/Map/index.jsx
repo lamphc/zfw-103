@@ -19,7 +19,7 @@ class Map extends Component {
     // 1. 创建地图实例
     const map = new BMap.Map('container')
     // 获取定位城市
-    const { label: la, value } = await getCurrCity()
+    const { label: cityName, value } = await getCurrCity()
     // 地址解析=》解析经纬度=》Point
     // 创建地址解析器实例
     const myGeo = new BMap.Geocoder()
@@ -34,40 +34,6 @@ class Map extends Component {
            * 第二个参数：地图缩放级别=》数值越大：地图显示越详细，范围越小 =》数值越小：地图显示范围大，但是显示信息不详细
            */
           map.centerAndZoom(point, 11)
-
-          // 测试：获取地图第一层覆盖物的数据
-          const { status, data } = await getMapDataById(value)
-          console.log(status, data)
-          /**
-           * 创建文本覆盖物=>根据后台房源数据遍历创建展示房源数据的覆盖物
-           */
-          const opts = {
-            position: point, // 指定文本标注所在的地理位置
-            offset: new BMap.Size(0, 0), //设置文本偏移量
-          }
-          // 创建文本覆盖物的实例
-          const label = new BMap.Label(null, opts)
-          // 设置文本覆盖物的样式
-          label.setStyle({
-            // 清除默认样式
-            background: 'transparent',
-            border: 0,
-          })
-          // 设置html内容（不是jsx）
-          label.setContent(`
-          <div class="${styles.bubble}">
-          <p class="${styles.bubbleName}">顺义区</p>
-          <p>388套</p>
-        </div>
-          `)
-          //  添加到地图中渲染
-          map.addOverlay(label)
-
-          // 添加点击事件
-          label.addEventListener('click', () => {
-            console.log(la + ':' + value)
-          })
-
           // 添加地图操作控件
           // 地图平移缩放控件
           map.addControl(new BMap.NavigationControl())
@@ -82,9 +48,69 @@ class Map extends Component {
           map.addOverlay(marker)
           // 设置动画
           marker.setAnimation(window.BMAP_ANIMATION_BOUNCE) //跳动的动画
+
+          // 测试：获取地图第一层覆盖物的数据
+          const { status, data } = await getMapDataById(value)
+          console.log(status, data)
+          if (status === 200) {
+            /**
+             * 根据当前定位城市所有区的数据
+             * 1. 遍历所有区的数据=》画圈圈
+             * 2. 在圈圈上展示区的待出租房源数据
+             */
+            data.forEach((item) => {
+              // 获取定位城市区的数据
+              const {
+                coord: { longitude, latitude },
+                label: name,
+                count,
+                value,
+              } = item
+              /**
+               * 创建文本覆盖物=>根据后台房源数据遍历创建展示房源数据的覆盖物
+               */
+              // 创建当前区的point点
+              const ipoint = new BMap.Point(longitude, latitude)
+              const opts = {
+                position: ipoint, // 指定文本标注所在的地理位置
+                offset: new BMap.Size(0, 0), //设置文本偏移量
+              }
+              // 创建文本覆盖物的实例
+              const label = new BMap.Label(null, opts)
+              // 设置文本覆盖物的样式
+              label.setStyle({
+                // 清除默认样式
+                background: 'transparent',
+                border: 0,
+              })
+              // 设置html内容（不是jsx）
+              label.setContent(`
+                    <div class="${styles.bubble}">
+                    <p class="${styles.bubbleName}">${name}</p>
+                    <p>${count}套</p>
+                  </div>
+                    `)
+              // 添加点击事件
+              label.addEventListener('click', () => {
+                console.log(cityName + ':' + value)
+                // 进入到当前区的下一层
+                /**
+                 * 1. 清除上一层覆盖物（圈圈）;定位到当前坐标点和放大地图
+                 * 2. 加载下一层数据=》画圈圈
+                 */
+                map.centerAndZoom(ipoint, 13)
+                // 异步执行清除覆盖物
+                setTimeout(() => {
+                  map.clearOverlays()
+                }, 0)
+              })
+              //  添加到地图中渲染
+              map.addOverlay(label)
+            })
+          }
         }
       },
-      la
+      cityName
     )
   }
 

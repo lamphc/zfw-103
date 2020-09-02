@@ -3,6 +3,8 @@ import React, { useState, useEffect, useContext, useRef } from 'react'
 import { useDrop } from 'react-use'
 import useSpring from 'react-use/lib/useSpring'
 
+import './index.scss'
+
 /**
  * 跨多级组件通信（共享数据）
  * Context对象
@@ -97,7 +99,7 @@ const Demo = () => {
   })
 
   return (
-    <div style={{ width: '100%', height: '300px', background: '#eee' }}>
+    <div className="bg" style={{ width: '100%', height: '300px' }}>
       Drop something on the page.
     </div>
   )
