@@ -15,14 +15,15 @@ class Map extends Component {
     // 验证百度地图API是否成功引入=》成功会输出百度地图提供的方法对象
     console.log(window.BMap)
     // 解构百度地图API
-    const { BMap } = window
+    // 存储到组件this上=》跨方法调用
+    this.BMap = window.BMap
     // 1. 创建地图实例
-    const map = new BMap.Map('container')
+    this.map = new this.BMap.Map('container')
     // 获取定位城市
     const { label: cityName, value } = await getCurrCity()
     // 地址解析=》解析经纬度=》Point
     // 创建地址解析器实例
-    const myGeo = new BMap.Geocoder()
+    const myGeo = new this.BMap.Geocoder()
     // 将地址解析结果显示在地图上，并调整地图视野
     myGeo.getPoint(
       null,
@@ -33,85 +34,145 @@ class Map extends Component {
            * 第一参数：地图显示的中心位置
            * 第二个参数：地图缩放级别=》数值越大：地图显示越详细，范围越小 =》数值越小：地图显示范围大，但是显示信息不详细
            */
-          map.centerAndZoom(point, 11)
+          this.map.centerAndZoom(point, 11)
           // 添加地图操作控件
           // 地图平移缩放控件
-          map.addControl(new BMap.NavigationControl())
+          this.map.addControl(new this.BMap.NavigationControl())
           // 比例尺控件
-          map.addControl(new BMap.ScaleControl())
+          this.map.addControl(new this.BMap.ScaleControl())
           // 缩略图控件
-          map.addControl(new BMap.OverviewMapControl())
+          this.map.addControl(new this.BMap.OverviewMapControl())
           // 地图类型（卫星、三维）
-          map.addControl(new BMap.MapTypeControl())
+          this.map.addControl(new this.BMap.MapTypeControl())
           // 添加marker覆盖物
-          const marker = new BMap.Marker(point)
-          map.addOverlay(marker)
+          const marker = new this.BMap.Marker(point)
+          this.map.addOverlay(marker)
           // 设置动画
           marker.setAnimation(window.BMAP_ANIMATION_BOUNCE) //跳动的动画
 
-          // 测试：获取地图第一层覆盖物的数据
-          const { status, data } = await getMapDataById(value)
-          console.log(status, data)
-          if (status === 200) {
-            /**
-             * 根据当前定位城市所有区的数据
-             * 1. 遍历所有区的数据=》画圈圈
-             * 2. 在圈圈上展示区的待出租房源数据
-             */
-            data.forEach((item) => {
-              // 获取定位城市区的数据
-              const {
-                coord: { longitude, latitude },
-                label: name,
-                count,
-                value,
-              } = item
-              /**
-               * 创建文本覆盖物=>根据后台房源数据遍历创建展示房源数据的覆盖物
-               */
-              // 创建当前区的point点
-              const ipoint = new BMap.Point(longitude, latitude)
-              const opts = {
-                position: ipoint, // 指定文本标注所在的地理位置
-                offset: new BMap.Size(0, 0), //设置文本偏移量
-              }
-              // 创建文本覆盖物的实例
-              const label = new BMap.Label(null, opts)
-              // 设置文本覆盖物的样式
-              label.setStyle({
-                // 清除默认样式
-                background: 'transparent',
-                border: 0,
-              })
-              // 设置html内容（不是jsx）
-              label.setContent(`
-                    <div class="${styles.bubble}">
-                    <p class="${styles.bubbleName}">${name}</p>
-                    <p>${count}套</p>
-                  </div>
-                    `)
-              // 添加点击事件
-              label.addEventListener('click', () => {
-                console.log(cityName + ':' + value)
-                // 进入到当前区的下一层
-                /**
-                 * 1. 清除上一层覆盖物（圈圈）;定位到当前坐标点和放大地图
-                 * 2. 加载下一层数据=》画圈圈
-                 */
-                map.centerAndZoom(ipoint, 13)
-                // 异步执行清除覆盖物
-                setTimeout(() => {
-                  map.clearOverlays()
-                }, 0)
-              })
-              //  添加到地图中渲染
-              map.addOverlay(label)
-            })
-          }
+          // 画第一层的圈圈
+          this.renderOverlays(value)
         }
       },
       cityName
     )
+  }
+
+  /**
+   * 画圈圈并展示数据
+   * @param {*} value 城市ID/区ID/街道ID
+   */
+  async renderOverlays(value) {
+    // 测试：获取地图第一层覆盖物的数据
+    const { status, data } = await getMapDataById(value)
+    console.log(status, data)
+    // 确定当前画的覆盖物的形状和下一层的缩放大小
+    const { type, zoom } = this.getTypeAndZoom()
+    if (status === 200) {
+      /**
+       * 根据当前定位城市所有区的数据
+       * 1. 遍历所有区的数据=》画圈圈
+       * 2. 在圈圈上展示区的待出租房源数据
+       */
+      data.forEach((item) => {
+        // 获取定位城市区的数据
+        const {
+          coord: { longitude, latitude },
+          label: name,
+          count,
+          // 当前区到ID
+          value,
+        } = item
+        /**
+         * 创建文本覆盖物=>根据后台房源数据遍历创建展示房源数据的覆盖物
+         */
+        // 创建当前区的point点
+        const ipoint = new this.BMap.Point(longitude, latitude)
+        const opts = {
+          position: ipoint, // 指定文本标注所在的地理位置
+          offset: new this.BMap.Size(0, 0), //设置文本偏移量
+        }
+        // 创建文本覆盖物的实例
+        const label = new this.BMap.Label(null, opts)
+        // 设置文本覆盖物的样式
+        label.setStyle({
+          // 清除默认样式
+          background: 'transparent',
+          border: 0,
+        })
+
+        if (type === 'circle') {
+          // 画圈圈
+          // 设置html内容（不是jsx）
+          label.setContent(`
+        <div class="${styles.bubble}">
+          <p class="${styles.bubbleName}">${name}</p>
+          <p>${count}套</p>
+        </div>
+         `)
+        } else {
+          // 画长方形
+          label.setContent(
+            `
+            <div style="background:red;color:#fff;padding:10px">${name}</div>
+            `
+          )
+        }
+
+        // 添加点击事件
+        label.addEventListener('click', () => {
+          // 进入到当前区的下一层
+          /**
+           * 1. 清除上一层覆盖物（圈圈）;定位到当前坐标点和放大地图
+           * 2. 加载下一层数据=》画圈圈
+           */
+          this.map.centerAndZoom(ipoint, zoom)
+          // 异步执行清除覆盖物
+          setTimeout(() => {
+            this.map.clearOverlays()
+          }, 0)
+          // 画下一层覆盖物=》封装
+          /**
+           * value=》// 当前区到ID
+           */
+          this.renderOverlays(value)
+        })
+        //  添加到地图中渲染
+        this.map.addOverlay(label)
+      })
+    }
+  }
+
+  // 确定当前画的覆盖物的形状和下一层的缩放大小
+  // 计算要绘制的覆盖物类型和下一个缩放级别
+  // 区   -> 11 ，范围：>=10 <12
+  // 街道   -> 13 ，范围：>=12 <14
+  // 小区 -> 15 ，范围：>=14 <16
+  /**
+   * type 覆盖物的形状
+   * zoom 下一层地图的缩放级别
+   */
+  getTypeAndZoom() {
+    let type, zoom
+    /**
+     * 如何确定？
+     * 1. 获取地图的缩放级别
+     * 2. 根据当前地图的缩放级别确定范围
+     */
+    const curZoom = this.map.getZoom()
+    if (curZoom >= 10 && curZoom < 12) {
+      type = 'circle'
+      // 第一层：区
+      zoom = 13
+    } else if (curZoom >= 12 && curZoom < 14) {
+      // 第二层：街道
+      type = 'circle'
+      zoom = 15
+    } else if (curZoom >= 14 && curZoom < 16) {
+      // 第三层：小区
+      type = 'rectangle'
+    }
+    return { type, zoom }
   }
 
   render() {
