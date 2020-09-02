@@ -15,7 +15,7 @@ export function getFilters (id) {
 
 /**
  * 
- * @param {*} cityId 当前定位城市ID
+ * @param {*} cityId 当前定位城市ID/小区ID
  * @param {*} filters 查询条件
  * @param {*} start 数据开始
  * @param {*} end  数据结束

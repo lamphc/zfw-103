@@ -4,8 +4,18 @@ import styles from './index.module.css'
 import { NavBar, Icon } from 'antd-mobile'
 import { getCurrCity } from '../../utils'
 import { getMapDataById } from '../../utils/api/city'
+import { getListByFilter } from '../../utils/api/house'
+import HouseItem from '../../components/HouseItem'
+import { BASE_URL } from '../../utils/request'
 
 class Map extends Component {
+  state = {
+    // 小区房源列表
+    list: [],
+    // 是否在地图中显示小区房源列表
+    isShowList: false,
+  }
+
   componentDidMount() {
     this.initMap()
   }
@@ -100,7 +110,8 @@ class Map extends Component {
           background: 'transparent',
           border: 0,
         })
-
+        // 点击覆盖物的事件处理函数
+        let labelCallback
         if (type === 'circle') {
           // 画圈圈
           // 设置html内容（不是jsx）
@@ -110,37 +121,71 @@ class Map extends Component {
           <p>${count}套</p>
         </div>
          `)
+          labelCallback = () => {
+            // 进入到当前区的下一层
+            /**
+             * 1. 清除上一层覆盖物（圈圈）;定位到当前坐标点和放大地图
+             * 2. 加载下一层数据=》画圈圈
+             */
+            this.map.centerAndZoom(ipoint, zoom)
+            // 异步执行清除覆盖物
+            setTimeout(() => {
+              this.map.clearOverlays()
+            }, 0)
+            // 画下一层覆盖物=》封装
+            /**
+             * value=》// 当前区到ID
+             */
+            this.renderOverlays(value)
+          }
         } else {
           // 画长方形
           label.setContent(
             `
-            <div style="background:red;color:#fff;padding:10px">${name}</div>
+            <div class="${styles.rect}">
+              <span class="${styles.housename}">${name}</span>
+              <span class="${styles.housenum}">${count}套</span>
+              <i class="${styles.arrow}"></i>
+            </div>
             `
           )
+          labelCallback = (e) => {
+            console.log('在地图中加载当前点击小区的房源列表数据')
+            this.handlerHouseList(value)
+            //把当前点击小区移动到地图中心点
+            this.moveToCenter(e)
+          }
         }
 
         // 添加点击事件
-        label.addEventListener('click', () => {
-          // 进入到当前区的下一层
-          /**
-           * 1. 清除上一层覆盖物（圈圈）;定位到当前坐标点和放大地图
-           * 2. 加载下一层数据=》画圈圈
-           */
-          this.map.centerAndZoom(ipoint, zoom)
-          // 异步执行清除覆盖物
-          setTimeout(() => {
-            this.map.clearOverlays()
-          }, 0)
-          // 画下一层覆盖物=》封装
-          /**
-           * value=》// 当前区到ID
-           */
-          this.renderOverlays(value)
-        })
+        label.addEventListener('click', labelCallback)
         //  添加到地图中渲染
         this.map.addOverlay(label)
       })
     }
+  }
+
+  //把当前点击小区移动到地图中心点
+  moveToCenter(e) {
+    /**
+     * 计算移动距离（x,y）?
+     * 1. 获取起点位置
+     * 2. 获取中心（终点）位置
+     * 3. 终点坐标-起点坐标=（x,y）移动差值
+     */
+    // console.log(e)
+    const [startPos] = e.changedTouches
+    // 起点坐标
+    let startX = startPos.clientX,
+      startY = startPos.clientY
+    // 终点坐标
+    let endX = window.innerWidth / 2,
+      endY = (window.innerHeight - 330) / 2
+    // 移动坐标
+    let moveX = endX - startX,
+      moveY = endY - startY
+    // 移动开始位置到终点
+    this.map.panBy(moveX, moveY)
   }
 
   // 确定当前画的覆盖物的形状和下一层的缩放大小
@@ -160,6 +205,7 @@ class Map extends Component {
      * 2. 根据当前地图的缩放级别确定范围
      */
     const curZoom = this.map.getZoom()
+    console.log('curZoom:', curZoom)
     if (curZoom >= 10 && curZoom < 12) {
       type = 'circle'
       // 第一层：区
@@ -175,6 +221,55 @@ class Map extends Component {
     return { type, zoom }
   }
 
+  async handlerHouseList(id) {
+    let {
+      status,
+      data: { list },
+    } = await getListByFilter(id)
+    // console.log(status, data)
+    if (status === 200) {
+      this.setState({
+        list,
+        isShowList: true,
+      })
+    }
+  }
+
+  // 渲染小区下房屋列表
+  renderHouseList = () => {
+    return (
+      <div
+        className={[
+          styles.houseList,
+          this.state.isShowList ? styles.show : '',
+        ].join(' ')}>
+        <div className={styles.titleWrap}>
+          <h1 className={styles.listTitle}>房屋列表</h1>
+          <a className={styles.titleMore} href="/home/house">
+            更多房源
+          </a>
+        </div>
+
+        <div className={styles.houseItems}>
+          {/* 房屋结构 */}
+          {this.state.list.map((item) => (
+            <HouseItem
+              onClick={() =>
+                this.props.history.push(`/detail/${item.houseCode}`)
+              }
+              key={item.houseCode}
+              src={BASE_URL + item.houseImg}
+              title={item.title}
+              desc={item.desc}
+              tags={item.tags}
+              price={item.price}
+            />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   render() {
     return (
       <div className={styles.mapBox}>
@@ -186,6 +281,8 @@ class Map extends Component {
         </NavBar>
         {/* 地图容器=》渲染百度地图 */}
         <div id="container"></div>
+        {/* 渲染小区列表 */}
+        {this.renderHouseList()}
       </div>
     )
   }
