@@ -66,6 +66,16 @@ class Map extends Component {
       },
       cityName
     )
+
+    // 添加地图移动监控事件
+    this.map.addEventListener('movestart', () => {
+      const { isShowList } = this.state
+      if (isShowList) {
+        console.log('地图开始移动了')
+        // 地图移动时候=》如果小区列表显示=》关闭
+        this.setState({ isShowList: false })
+      }
+    })
   }
 
   /**
