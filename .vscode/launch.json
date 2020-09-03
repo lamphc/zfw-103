@@ -1,0 +1,15 @@
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-chrome", // 调式方式=》基于Google浏览器
+      "request": "launch", // 启动方式
+      "name": "好租房调试", // 调试名字
+      "url": "http://localhost:3000", // 调试本地服务的地址和端口号
+      "webRoot": "${workspaceFolder}" // 项目目录=》指向当前配置文件所在项目的根目录
+    }
+  ]
+}

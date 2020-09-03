@@ -44,6 +44,7 @@ export default class Index extends Component {
   // 获取定位信息
   async getCity() {
     const res = await getCurrCity()
+
     console.log('获取定位信息：', res)
     this.setState({
       cityInfo: res,

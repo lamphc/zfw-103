@@ -1,17 +1,24 @@
-import React, { Component } from 'react'
+import React, { Component, lazy } from 'react'
 // 导入路由配置组件
 import { Route } from 'react-router-dom'
 import { TabBar } from 'antd-mobile'
 // 导入二级路由组件
 import Index from '../Index'
-import House from '../House'
-import Profile from '../Profile'
+
+// import House from '../House'
+// import Profile from '../Profile'
+// import Hook from '../Hook'
+
 // 导入组件样式
 import './index.css'
 
 // 导入tabBar配置
 import TabBarList from '../../utils/tabBarConfig'
-import Hook from '../Hook'
+
+// 懒加载页面
+const House = lazy(() => import('../House'))
+const Profile = lazy(() => import('../Profile'))
+const Hook = lazy(() => import('../Hook'))
 
 class Home extends Component {
   // 响应数据

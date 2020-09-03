@@ -8,7 +8,8 @@ import { getToken } from '.'
 
 // 创建axios实例
 // 请求的基础地址
-const BASE_URL = 'http://api-haoke-dev.itheima.net'
+// const BASE_URL = 'http://api-haoke-dev.itheima.net'
+const BASE_URL = 'https://api-haoke-web.itheima.net'
 const MyAxios = axios.create({
   baseURL: BASE_URL
 })
